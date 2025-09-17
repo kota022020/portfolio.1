@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kota – Portfolio</title>
+
+  <!-- 自サイト内パスで安定表示 -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="mask-icon" href="/logo.svg" color="#ff1744">
+
+  <!-- 共有サムネ（OGP）にプロフィール画像を使うなら -->
+  <meta property="og:title" content="Kota – Portfolio">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/images/yourname.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+
+  <meta name="description" content="Hero portfolio section inspired by Alex-style layout (HTML & CSS only)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+/* スマホのタップ時ハイライトを無効化 */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* テキスト選択をデフォルト無効化（必要箇所は後で上書き可） */
+* { -webkit-user-select:none; -moz-user-select:none; user-select:none; }
+::selection, ::-moz-selection { background: transparent; color: inherit; }
+
+/* （注意）全体リセットは残しつつ、メニュー＆ボタンの色は下で上書き */
+a, button { outline:none!important; box-shadow:none!important; background:none!important; color:inherit!important; }
+a:focus, a:focus-visible, a:active,
+button:focus, button:focus-visible, button:active { outline:none!important; box-shadow:none!important; background:none!important; color:inherit!important; }
+
+:root{
+  --bg:#0b0b18;
+  --text:#f2f2f2;
+  --muted:#c9c9c9;
+  --accent:#ff1744;
+  --accent-glow:#ff1744cc;
+  --accent-glow-2:#ff174466;
+  --card:#121212;
+}
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* 背景（銀河） */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-3;
+  background:
+    radial-gradient(1100px 700px at 12% 15%, #304ffe55 0%, transparent 60%),
+    radial-gradient(950px 650px at 85% 20%, #a855f755 0%, transparent 60%),
+    radial-gradient(900px 650px at 50% 85%, #22d3ee44 0%, transparent 60%),
+    linear-gradient(180deg, #0a0a17 0%, #0b0b18 50%, #0a0a14 100%);
+  filter:saturate(1.1);
+}
+
+#shooting-canvas{ position:fixed; inset:0; z-index:-2; display:block; pointer-events:none; }
+.stars{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+.stars i{ position:absolute; width:2px; height:2px; background:#fff; opacity:.75; border-radius:50%; animation: twinkle 6s linear infinite; }
+@keyframes twinkle{ 50%{ opacity:.2; transform: translateY(-6px);} }
+
+.wrap{ max-width:1200px; margin:0 auto; padding:0 24px }
+
+/* ==== ヘッダー：完全透過（境界線なし） ==== */
+header{
+  position:sticky; top:0; z-index:10;
+  background:transparent!important;
+  border-bottom:none!important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  backdrop-filter: blur(8px) saturate(1.2);
+}
+
+/* ヘッダー全幅・右端寄せ */
+header .wrap{
+  max-width:none; width:100%; margin:0;
+  padding-left:24px; padding-right:12px;
+}
+.nav{
+  display:flex; align-items:center; justify-content:flex-end;
+  height:72px;
+}
+.brand{ display:none !important; }
+
+/* メニュー（＝タブ） */
+.menu{ display:flex; gap:28px; margin-left:auto; }
+.menu a[role="tab"]{
+  cursor:pointer;
+  color:#ddd; text-decoration:none; font-weight:600; position:relative; padding:6px 2px;
+  transition: color .2s ease, text-shadow .2s ease, transform .15s ease;
+}
+.menu a[role="tab"]:hover{
+  color:var(--accent);
+  text-shadow: 0 0 6px var(--accent-glow), 0 0 16px var(--accent-glow-2);
+}
+.menu a[role="tab"][aria-selected="true"]{
+  color:var(--accent);
+  text-shadow: 0 0 6px var(--accent-glow);
+}
+.menu a[role="tab"][aria-selected="true"]::after,
+.menu a[role="tab"]:hover::after{
+  content:""; position:absolute; left:0; right:0; bottom:-8px; height:2px; border-radius:2px;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow), 0 0 12px var(--accent-glow-2);
+}
+.menu a[role="tab"]:focus-visible{
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 4px !important;
+  border-radius:6px;
+}
+
+/* ==== タブの中身（パネル） ==== */
+.panels{ position:relative; }
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+/* Home */
+.hero{ display:grid; grid-template-columns: 1.05fr 1fr; gap:60px; align-items:center; padding:80px 0 }
+.portrait{ position:relative; width:min(520px,100%); aspect-ratio:1/1; border-radius:50%; overflow:hidden; margin:0 auto; }
+.portrait::before{ content:""; position:absolute; inset:0; z-index:0; background: radial-gradient(circle at 55% 45%, #ff5b42 0%, #d74333 55%, #88261f 90%); }
+.portrait img{ position:relative; z-index:1; width:100%; height:100%; object-fit:cover; object-position:center; filter: drop-shadow(0 10px 30px rgba(0,0,0,.6)); }
+
+.title-hello{ font-size:clamp(22px,2.6vw,30px); margin:0 0 10px; font-weight:700 }
+.title-hello .name{ color:var(--accent); text-shadow: 0 0 6px var(--accent-glow); }
+.title-i{ font-size:clamp(44px,6vw,64px); line-height:1.05; margin:0 0 8px; font-weight:800 }
+.title-i .accent{ color:var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+.lead{ color:var(--muted); margin:18px 0 26px; max-width:60ch }
+
+.socials{ display:flex; gap:14px; margin:18px 0 32px }
+.socials a{
+  display:inline-grid; place-items:center; width:44px; height:44px;
+  border:2px solid var(--accent); border-radius:50%;
+  color:var(--accent); text-decoration:none; font-size:18px; transition:.2s;
+  box-shadow: 0 0 8px 0 var(--accent-glow-2) inset;
+}
+.socials a:hover{ background:var(--accent); color:#0a0a0a; box-shadow: 0 0 16px var(--accent-glow); }
+
+.btn-outline{
+  display:inline-block; border:2px solid var(--accent); color:var(--accent);
+  background:transparent; padding:14px 36px; border-radius:999px;
+  font-weight:700; letter-spacing:.03em; text-decoration:none; transition:.2s;
+  box-shadow: 0 0 10px var(--accent-glow-2) inset;
+}
+.btn-outline:hover{ background:var(--accent); color:#0b0b0b; box-shadow: 0 0 18px var(--accent-glow); }
+
+/* ほかのパネル */
+.section{ padding:80px 0; }
+.section h2{ margin:0 0 20px; font-size:36px; font-weight:800; }
+.muted{ color:var(--muted); }
+.cards{ display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:20px; }
+.card{
+  background:#ffffff08; border:1px solid #ffffff22; border-radius:16px; padding:20px;
+  transition:.2s; user-select:text;
+}
+.card:hover{ transform:translateY(-2px); box-shadow:0 8px 30px #0006; }
+.list{ display:grid; gap:10px; }
+.badge{ display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid #ffffff33; background:#ffffff10; margin:4px 6px 0 0; }
+
+@media (max-width:980px){
+  .hero{ grid-template-columns:1fr; gap:36px; padding:48px 0 }
+  .portrait{ order:1 }
+  .hero .copy{ order:2 }
+  .menu{ gap:18px }
+  .cards{ grid-template-columns: 1fr; }
+}
+
+/* === 音量コントロール === */
+.audio-ui{
+  position: fixed;
+  right: 18px; bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+  background: #ffffff14; border: 1px solid #ffffff22;
+  backdrop-filter: blur(8px) saturate(1.1);
+  padding: 10px 12px; border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  z-index: 20;
+  user-select: auto;
+}
+.audio-ui .mute-btn{
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  background: #ffffff12 !important;
+  border: 1px solid #ffffff25 !important;
+  color: var(--text) !important;
+  cursor: pointer; transition: .2s;
+}
+.audio-ui .mute-btn:hover{ background:#ffffff20 !important; }
+.audio-ui .mute-btn:focus-visible{
+  outline: 2px solid var(--accent) !important; outline-offset: 2px !important; border-radius: 10px;
+}
+.audio-ui.is-muted .mute-btn{ color:#bbb !important; }
+.audio-ui .vol-range{
+  width: 160px; height: 4px; -webkit-appearance: none; appearance: none;
+  background: #ffffff30; border-radius: 999px; outline: none; cursor: pointer;
+}
+.audio-ui .vol-range::-webkit-slider-runnable-track{ height: 4px; background: transparent; border-radius: 999px; }
+.audio-ui .vol-range::-moz-range-track{ height: 4px; background: transparent; border-radius: 999px; }
+.audio-ui .vol-range::-webkit-slider-thumb{
+  -webkit-appearance: none; width: 16px; height:16px; border-radius:50%;
+  background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+  border: 2px solid #000; margin-top: -6px;
+}
+.audio-ui .vol-range::-moz-range-thumb{
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); border: none;
+}
+.audio-ui .vol-percent{ min-width: 40px; text-align: right; font-weight: 700; color:#ddd; }
+.audio-ui.is-muted .vol-percent{ color:#aaa; }
+
+/* ===== Memo 2カラム配置 & Opinions スタイル ===== */
+.memo-grid{
+  display:grid; gap:20px;
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width:980px){
+  .memo-grid{ grid-template-columns: 1fr; }
+}
+.opinions .op-form{ display:grid; gap:10px; }
+.opinions input, .opinions textarea{
+  padding:10px; border-radius:10px;
+  background:#ffffff0e; border:1px solid #ffffff26; color:#fff;
+}
+.opinions button{ justify-self:start; }
+.op-list{ display:grid; gap:12px; margin-top:14px; }
+.op-item{
+  background:#ffffff0a; border:1px solid #ffffff22; border-radius:12px; padding:12px;
+}
+.op-head{ display:flex; gap:8px; align-items:center; }
+.op-name{ font-weight:700; }
+.op-time{ color:#aaa; font-size:12px; margin-left:auto; }
+.op-msg{ white-space:pre-wrap; margin-top:6px; line-height:1.6; }
+  </style>
+</head>
+
+<body>
+  <canvas id="shooting-canvas"></canvas>
+  <div class="stars" id="stars"></div>
+
+  <header>
+    <div class="wrap nav">
+      <div class="brand">Kota</div>
+      <!-- ★ タブナビ（ARIA対応） -->
+      <nav class="menu" aria-label="Primary" role="tablist">
+        <a href="#home"        data-tab="home"        id="tab-home"        role="tab" aria-controls="panel-home"        aria-selected="true"  tabindex="0"  class="active">Home</a>
+        <a href="#projects"    data-tab="projects"    id="tab-projects"    role="tab" aria-controls="panel-projects"    aria-selected="false" tabindex="-1">Projects</a>
+        <a href="#skills"      data-tab="skills"      id="tab-skills"      role="tab" aria-controls="panel-skills"      aria-selected="false" tabindex="-1">Skills</a>
+        <a href="#memo"        data-tab="memo"        id="tab-memo"        role="tab" aria-controls="panel-memo"        aria-selected="false" tabindex="-1">Memo</a>
+        <a href="#experience"  data-tab="experience"  id="tab-experience"  role="tab" aria-controls="panel-experience"  aria-selected="false" tabindex="-1">Experience</a>
+        <a href="#contact"     data-tab="contact"     id="tab-contact"     role="tab" aria-controls="panel-contact"     aria-selected="false" tabindex="-1">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==== タブの中身 ==== -->
+  <div class="panels">
+    <!-- Home -->
+    <section class="panel active" id="panel-home" role="tabpanel" aria-labelledby="tab-home">
+      <main class="wrap hero" role="main">
+        <div class="portrait" aria-label="Portrait circle">
+          <!-- ✅ 送ってくれた画像を使用 -->
+          <img src="/images/yourname.jpg" alt="Profile">
+        </div>
+
+        <div class="copy">
+          <p class="title-hello">Hi, It's <span class="name">Kota</span></p>
+          <h1 class="title-i">I'm a <span class="accent">Developer</span></h1>
+          <p class="lead">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus labore dolores esse.
+            Odit similique doloribus tenetur doloremque, sunt commodi in ipsa repudiandae
+            debitis deleniti blanditiis quibusdam quaerat neque asperiores ea.
+          </p>
+
+          <div class="socials" aria-label="Social links">
+            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+            <a href="#" aria-label="GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+            <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+          </div>
+
+          <a class="btn-outline" href="#contact">Hire me</a>
+        </div>
+      </main>
+    </section>
+
+    <!-- Projects -->
+    <section class="panel" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" hidden>
+      <div class="wrap section">
+        <h2>Projects</h2>
+        <p class="muted">作ったもの・進行中のものをピックアップ。</p>
+        <div class="cards">
+          <div class="card">
+            <h3>Audio Visualizer + Portfolio</h3>
+            <p>銀河背景・BGM・タブUI。アクセシビリティ対応。</p>
+            <p><a href="#" target="_blank" rel="noopener">Live</a> ・ <a href="#" target="_blank" rel="noopener">GitHub</a></p>
+          </div>
+          <div class="card">
+            <h3>Typing Quest</h3>
+            <p>寿司打風タイピング。コンボと成長要素。</p>
+            <p><a href="#" target="_blank" rel="noopener">Demo</a> ・ <a href="#" target="_blank" rel="noopener">GitHub</a></p>
+          </div>
+          <div class="card">
+            <h3>Poop Clicker Z++</h3>
+            <p>アップグレード/称号/神イベントなど。</p>
+            <p><a href="#" target="_blank" rel="noopener">Demo</a> ・ <a href="#" target="_blank" rel="noopener">GitHub</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="panel" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
+      <div class="wrap section">
+        <h2>Skills</h2>
+        <div class="list">
+          <div><span class="badge">HTML</span><span class="badge">CSS / Tailwind</span><span class="badge">GSAP</span></div>
+          <div><span class="badge">JavaScript</span><span class="badge">TypeScript</span><span class="badge">React</span></div>
+          <div><span class="badge">Node.js</span><span class="badge">Express</span><span class="badge">Next.js</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Memo（左：自分用 / 右：意見ボード） -->
+    <section class="panel" id="panel-memo" role="tabpanel" aria-labelledby="tab-memo" hidden>
+      <div class="wrap section">
+        <h2>Memo</h2>
+        <p class="muted">制作日記・アイデア・学びメモ。左は自分用ローカル保存、右はみんなの意見ボード（誰でも投稿OK）。</p>
+
+        <div class="memo-grid">
+          <!-- 左：自分メモ（ローカル保存） -->
+          <div class="card" style="display:grid; gap:10px;">
+            <label for="memo-text" style="font-weight:700;">My notes</label>
+            <textarea id="memo-text" rows="10" placeholder="自由に書いてOK（自動保存）"
+              style="width:100%;resize:vertical;border-radius:12px;padding:12px;background:#ffffff0e;border:1px solid #ffffff26;color:#fff;"></textarea>
+            <div class="muted" id="memo-status">Saved.</div>
+
+            <!-- リクエスト送信（メール起動） -->
+            <div class="card" style="margin-top:12px;">
+              <h3 style="margin-top:0;">💡 つくってほしいもの（リクエスト）</h3>
+              <p class="muted">フォームに入力すると、メール作成画面が開きます（サーバー不要）。</p>
+              <form id="req-form" style="display:grid;gap:10px;">
+                <input required name="title"  placeholder="タイトル（例：ポートフォリオに星座モード）" style="padding:10px;border-radius:10px;background:#ffffff0e;border:1px solid #ffffff26;color:#fff;">
+                <textarea required name="detail" rows="4" placeholder="詳細（どんな機能？締切や参考URLがあれば）" style="padding:10px;border-radius:10px;background:#ffffff0e;border:1px solid #ffffff26;color:#fff;"></textarea>
+                <input name="contact" placeholder="連絡先（任意：メール/Discordなど）" style="padding:10px;border-radius:10px;background:#ffffff0e;border:1px solid #ffffff26;color:#fff;">
+                <button class="btn-outline" type="submit">メールで送る</button>
+                <small class="muted">※ 直接DMでもOK：Discord など</small>
+              </form>
+            </div>
+          </div>
+
+          <!-- 右：意見ボード（公開・誰でも投稿） -->
+          <div class="card opinions">
+            <h3 style="margin-top:0;">💬 Opinions（みんなの意見）</h3>
+            <p class="muted">ニックネームとメッセージを投稿すると、一覧に反映されます。</p>
+
+            <!-- 投稿フォーム -->
+            <form id="op-form" class="op-form" autocomplete="off">
+              <input name="name" maxlength="24" placeholder="ニックネーム（例：kota）" required>
+              <textarea name="message" rows="3" maxlength="500" placeholder="メッセージ（最大500文字）" required></textarea>
+              <input name="contact" placeholder="連絡先（任意：Discord/Twitter など）">
+              <button class="btn-outline" type="submit">投稿する</button>
+              <small class="muted" id="op-hint">公開: 新しい順に最大50件表示。荒らし対策で一部制限あり。</small>
+            </form>
+
+            <!-- 一覧 -->
+            <div id="op-list" class="op-list" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section class="panel" id="panel-experience" role="tabpanel" aria-labelledby="tab-experience" hidden>
+      <div class="wrap section">
+        <h2>Experience</h2>
+        <div class="cards">
+          <div class="card"><h3>Company A</h3><p>フロントエンドエンジニア / 20XX–</p></div>
+          <div class="card"><h3>Company B</h3><p>UIデベロッパー / 20XX–20XX</p></div>
+          <div class="card"><h3>Freelance</h3><p>各種Webサイト制作・運用</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="panel" id="panel-contact" role="tabpanel" aria-labelledby="tab-contact" hidden>
+      <div class="wrap section">
+        <h2>Contact</h2>
+        <p class="muted">ご依頼・相談はSNSまたはメールでお気軽にどうぞ。</p>
+        <div class="list">
+          <div>Email: <a href="mailto:hello@example.com" style="user-select:text">hello@example.com</a></div>
+          <div>Twitter / X: <a href="#" style="user-select:text">@yourhandle</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 星の生成 -->
+  <script>
+    (() => {
+      const stars = document.getElementById('stars');
+      if (!stars) return;
+      const STAR_COUNT = 140;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < STAR_COUNT; i++) {
+        const s = document.createElement('i');
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top  = Math.random() * 100 + '%';
+        s.style.opacity = 0.25 + Math.random() * 0.75;
+        s.style.transform = `scale(${0.6 + Math.random() * 1.4})`;
+        s.style.animationDelay = (Math.random() * 6) + 's';
+        frag.appendChild(s);
+      }
+      stars.appendChild(frag);
+    })();
+  </script>
+
+  <!-- 流れ星 -->
+  <script>
+    (() => {
+      const canvas = document.getElementById('shooting-canvas');
+      const ctx = canvas.getContext('2d');
+      const CONFIG = { spawnRate: 0.009, minSpeed: 900, maxSpeed: 1600, trail: 220, hue: 220, hueJitter: 18, fade: 0.35 };
+      let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      let W = 0, H = 0, shootings = [], lastT = performance.now();
+
+      function resize(){
+        const w = innerWidth, h = innerHeight;
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        W = Math.floor(w * dpr); H = Math.floor(h * dpr);
+        canvas.width = W; canvas.height = H;
+        canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+        ctx.fillStyle = 'rgba(11,11,24,1)'; ctx.fillRect(0,0,W,H);
+      }
+      function rand(a,b){ return a + Math.random()*(b-a); }
+      function spawn(){
+        const margin = 80 * dpr;
+        const startX = rand(-margin, W * 0.2);
+        const startY = rand(-margin, H * 0.3);
+        const angle  = rand(Math.PI*0.15, Math.PI*0.35);
+        const speed  = rand(CONFIG.minSpeed, CONFIG.maxSpeed) * dpr / 1000;
+        shootings.push({ x:startX, y:startY, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+          life:0, maxLife:rand(600,1200), hue: CONFIG.hue + rand(-CONFIG.hueJitter, CONFIG.hueJitter) });
+      }
+      function drawShooting(s, dt){
+        s.life += dt; s.x += s.vx*dt; s.y += s.vy*dt;
+        const vlen = Math.hypot(s.vx, s.vy);
+        const nx = (s.vx / vlen) * CONFIG.trail;
+        const ny = (s.vy / vlen) * CONFIG.trail;
+        const grad = ctx.createLinearGradient(s.x, s.y, s.x - nx, s.y - ny);
+        grad.addColorStop(0, `hsla(${s.hue} 100% 85% / .95)`); grad.addColorStop(1, `hsla(${s.hue} 100% 85% / 0)`);
+        ctx.strokeStyle = grad; ctx.lineWidth = 2 * dpr;
+        ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - nx, s.y - ny); ctx.stroke();
+        ctx.fillStyle = `hsla(${s.hue} 100% 90% / .9)`; ctx.beginPath(); ctx.arc(s.x, s.y, 1.6*dpr, 0, Math.PI*2); ctx.fill();
+      }
+      function loop(t){
+        const dt = t - lastT; lastT = t;
+        ctx.fillStyle = `rgba(11,11,24,${CONFIG.fade})`; ctx.fillRect(0,0,W,H);
+        if (Math.random() < CONFIG.spawnRate) spawn();
+        shootings = shootings.filter(s => { drawShooting(s, dt); return s.life < s.maxLife && s.x <= W+200*dpr && s.y <= H+200*dpr; });
+        requestAnimationFrame(loop);
+      }
+      resize(); addEventListener('resize', resize); requestAnimationFrame(t => { lastT = t; loop(t); });
+    })();
+  </script>
+
+  <!-- BGM 起動＆音量制御 -->
+  <script>
+    (function(){
+      /* ✅ 送ってくれた音源を使用 */
+      const FIXED_SRC = "/music/my-music.mp3";
+
+      const audio = new Audio(FIXED_SRC);
+      audio.loop = true; audio.preload = "auto"; audio.playsInline = true; audio.crossOrigin = "anonymous";
+
+      let ctx, source, gain;
+      let desiredVolume = Math.max(0, Math.min(1, Number(localStorage.getItem('bgm.volume') ?? '0.5')));
+      let desiredMuted  = localStorage.getItem('bgm.muted') === 'true';
+
+      function ensureAudioGraph(){
+        if (ctx) return;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        ctx = new AC();
+        gain = ctx.createGain();
+        gain.gain.value = desiredMuted ? 0 : desiredVolume;
+        source = ctx.createMediaElementSource(audio);
+        source.connect(gain).connect(ctx.destination);
+      }
+
+      async function start(){
+        ensureAudioGraph();
+        if (ctx.state === 'suspended') await ctx.resume();
+        try { await audio.play(); } catch {}
+        window.dispatchEvent(new CustomEvent('bgm:ready', { detail:{ audio, ctx, gain } }));
+      }
+
+      const kick = () => {
+        start();
+        ["click","touchstart","keydown"].forEach(ev => removeEventListener(ev, kick));
+      };
+      ["click","touchstart","keydown"].forEach(ev => addEventListener(ev, kick, { once:true, passive:true }));
+
+      function setVolume(v){
+        desiredVolume = Math.max(0, Math.min(1, v));
+        if (gain) gain.gain.value = desiredMuted ? 0 : desiredVolume;
+        localStorage.setItem('bgm.volume', String(desiredVolume));
+      }
+      function setMuted(m){
+        desiredMuted = !!m;
+        if (gain) gain.gain.value = desiredMuted ? 0 : desiredVolume;
+        localStorage.setItem('bgm.muted', String(desiredMuted));
+      }
+      function toggle(){ setMuted(!desiredMuted); }
+
+      window.BGM = {
+        audio,
+        get volume(){ return desiredVolume; },
+        setVolume,
+        get muted(){ return desiredMuted; },
+        setMuted,
+        toggle
+      };
+    })();
+  </script>
+
+  <!-- 音量UI -->
+  <div id="audio-ui" class="audio-ui" role="group" aria-label="Background music controls">
+    <button class="mute-btn" aria-label="Mute/Unmute" aria-pressed="false">
+      <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+    </button>
+    <input type="range" class="vol-range" min="0" max="100" step="1" value="50" aria-label="Volume">
+    <span class="vol-percent" aria-hidden="true"><span class="vol-label">50%</span></span>
+  </div>
+
+  <script>
+    (() => {
+      const ui = document.getElementById('audio-ui');
+      if (!ui) return;
+      const range   = ui.querySelector('.vol-range');
+      const labelEl = ui.querySelector('.vol-label');
+      const muteBtn = ui.querySelector('.mute-btn');
+      const icon    = muteBtn.querySelector('i');
+
+      function getAccent(){
+        return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff1744';
+      }
+      function paintFill(percent){
+        const p = Math.max(0, Math.min(100, Math.round(percent)));
+        const rest = 'rgba(255,255,255,0.19)';
+        const accent = getAccent();
+        range.style.background = `linear-gradient(90deg, ${accent} 0%, ${accent} ${p}%, ${rest} ${p}%, ${rest} 100%)`;
+      }
+
+      const savedVol   = Math.round(Number(localStorage.getItem('bgm.volume') ?? '0.5') * 100);
+      const savedMuted = localStorage.getItem('bgm.muted') === 'true';
+      range.value = String(savedVol);
+      labelEl.textContent = `${range.value}%`;
+      paintFill(savedVol);
+      if (savedMuted) ui.classList.add('is-muted');
+
+      function render(){
+        const vol = Math.round((window.BGM?.volume ?? 0.5) * 100);
+        const muted = !!(window.BGM?.muted);
+        range.value = String(vol);
+        labelEl.textContent = `${vol}%`;
+        paintFill(vol);
+        ui.classList.toggle('is-muted', muted);
+        muteBtn.setAttribute('aria-pressed', String(muted));
+        if (icon) icon.className = muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+      }
+
+      range.addEventListener('input', () => {
+        const v = range.valueAsNumber / 100;
+        window.BGM?.setMuted(false);
+        window.BGM?.setVolume(v);
+        localStorage.setItem('bgm.volume', String(v));
+        localStorage.setItem('bgm.muted', 'false');
+        render();
+      });
+
+      muteBtn.addEventListener('click', () => {
+        window.BGM?.toggle();
+        render();
+      });
+
+      window.addEventListener('bgm:ready', render);
+      setTimeout(render, 0);
+    })();
+  </script>
+
+  <!-- タブ切替（Projects & Memo 対応） -->
+  <script>
+    (() => {
+      const menu = document.querySelector('nav.menu[role="tablist"]');
+      if (!menu) return;
+
+      const tabs = Array.from(menu.querySelectorAll('a[role="tab"][data-tab]'));
+      const panels = {
+        home:       document.getElementById('panel-home'),
+        projects:   document.getElementById('panel-projects'),
+        skills:     document.getElementById('panel-skills'),
+        memo:       document.getElementById('panel-memo'),
+        experience: document.getElementById('panel-experience'),
+        contact:    document.getElementById('panel-contact'),
+      };
+
+      function setAriaForPanels() {
+        tabs.forEach(tab => {
+          const name = tab.dataset.tab;
+          const panel = panels[name];
+          if (panel) {
+            tab.setAttribute('aria-controls', panel.id);
+            panel.setAttribute('aria-labelledby', tab.id);
+          }
+        });
+      }
+
+      function show(tabName, focusTab = false) {
+        const targetTab = tabs.find(t => t.dataset.tab === tabName) || tabs[0];
+        const targetPanel = panels[tabName];
+
+        tabs.forEach(t => {
+          const isActive = t === targetTab;
+          t.classList.toggle('active', isActive);
+          t.setAttribute('aria-selected', String(isActive));
+          t.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
+
+        Object.entries(panels).forEach(([key, el]) => {
+          if (!el) return;
+          const isActive = key === tabName;
+          el.classList.toggle('active', isActive);
+          if (isActive) el.removeAttribute('hidden');
+          else el.setAttribute('hidden', '');
+        });
+
+        const hash = tabName === 'home' ? '#home' : `#${tabName}`;
+        history.replaceState(null, '', hash);
+
+        if (focusTab) targetTab.focus();
+      }
+
+      function indexOfActive() {
+        return tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+      }
+
+      menu.addEventListener('click', (e) => {
+        const a = e.target.closest('a[role="tab"][data-tab]');
+        if (!a) return;
+        e.preventDefault();
+        show(a.dataset.tab, true);
+      });
+
+      menu.addEventListener('keydown', (e) => {
+        const len = tabs.length;
+        if (!len) return;
+        const current = indexOfActive();
+        let next = null;
+
+        switch (e.key) {
+          case 'ArrowRight':
+            e.preventDefault();
+            next = (current + 1 + len) % len;
+            show(tabs[next].dataset.tab, true);
+            break;
+          case 'ArrowLeft':
+            e.preventDefault();
+            next = (current - 1 + len) % len;
+            show(tabs[next].dataset.tab, true);
+            break;
+          case 'Home':
+            e.preventDefault();
+            show(tabs[0].dataset.tab, true);
+            break;
+          case 'End':
+            e.preventDefault();
+            show(tabs[len - 1].dataset.tab, true);
+            break;
+          case 'Enter':
+          case ' ':
+            {
+              const a = document.activeElement.closest('a[role="tab"][data-tab]');
+              if (a) {
+                e.preventDefault();
+                show(a.dataset.tab, true);
+              }
+            }
+            break;
+          default:
+            break;
+        }
+      });
+
+      window.addEventListener('hashchange', () => {
+        const t = (location.hash || '#home').replace('#','');
+        if (panels[t]) show(t, true);
+      });
+
+      setAriaForPanels();
+      const initial = (location.hash || '#home').replace('#','');
+      show(panels[initial] ? initial : 'home', false);
+    })();
+  </script>
+
+  <!-- タブタイトル（消えて書かれてアニメ） -->
+  <script>
+(() => {
+  const TEXTS = ["Kota – Portfolio"];
+  const CURSOR = "▎";
+  const BLINK_MS = 500;
+  const HOLD_FULL = 900;
+  const HOLD_EMPTY = 500;
+
+  const qs = new URLSearchParams(location.search);
+  const saved = Number(localStorage.getItem("tabTitle.speed") || "");
+  let SPEED_LEVEL = clamp(
+    Number(qs.get("titleSpeed")) || (Number.isFinite(saved) ? saved : 7),
+    1, 10
+  );
+
+  const segment = (s) => {
+    if (window.Intl && Intl.Segmenter) {
+      const seg = new Intl.Segmenter('ja', { granularity: 'grapheme' });
+      return Array.from(seg.segment(s), x => x.segment);
+    }
+    return Array.from(s);
+  };
+  const ITEMS = TEXTS.map(segment);
+
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const msFromLevel = (lvl, slow, fast) => {
+    const t = (clamp(lvl, 1, 10) - 1) / 9;
+    return Math.round(lerp(slow, fast, t));
+  };
+  const typeMs = () => msFromLevel(SPEED_LEVEL, 220, 40);
+  const eraseMs = () => msFromLevel(SPEED_LEVEL, 160, 30);
+
+  if (matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.title = TEXTS[0] || document.title;
+    return;
+  }
+
+  let t = 0, i = 0, dir = 1;
+  let timer = null, blinkTimer = null, cursorOn = true;
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+  const render = () => {
+    const arr = ITEMS[t];
+    const shown = arr.slice(0, i).join("");
+    document.title = CURSOR ? shown + (cursorOn ? CURSOR : " ") : shown;
+  };
+
+  const schedule = (ms) => {
+    const factor = document.hidden ? 2.5 : 1;
+    timer = setTimeout(step, ms * factor);
+  };
+
+  const step = () => {
+    const arr = ITEMS[t];
+    if (dir === 1) {
+      if (i < arr.length) { i++; render(); schedule(typeMs()); }
+      else { dir = -1; schedule(HOLD_FULL); }
+    } else {
+      if (i > 0) { i--; render(); schedule(eraseMs()); }
+      else { dir = 1; t = (t + 1) % ITEMS.length; schedule(HOLD_EMPTY); }
+    }
+  };
+
+  const start = () => {
+    stop();
+    blinkTimer = setInterval(() => { cursorOn = !cursorOn; render(); }, BLINK_MS);
+    render(); schedule(0);
+  };
+  const stop = () => { clearTimeout(timer); clearInterval(blinkTimer); };
+
+  window.TabTitleFX = {
+    setTexts(arr){
+      TEXTS.splice(0, TEXTS.length, ...arr);
+      ITEMS.splice(0, ITEMS.length, ...arr.map(segment));
+      t=0; i=0; dir=1; render();
+    },
+    setSpeed(level){
+      SPEED_LEVEL = clamp(Math.round(level), 1, 10);
+      localStorage.setItem("tabTitle.speed", String(SPEED_LEVEL));
+    },
+    getSpeed(){ return SPEED_LEVEL; },
+    start, stop
+  };
+
+  start();
+
+  window.addEventListener("keydown", (e) => {
+    if (!e.altKey) return;
+    if (e.key === "]") { window.TabTitleFX.setSpeed(SPEED_LEVEL + 1); }
+    if (e.key === "[") { window.TabTitleFX.setSpeed(SPEED_LEVEL - 1); }
+  });
+})();
+  </script>
+
+  <!-- Memo 保存 & Request メール起動 -->
+  <script>
+(() => {
+  // Memo: localStorage 保存
+  const memo = document.getElementById('memo-text');
+  const stat = document.getElementById('memo-status');
+  if (memo) {
+    const KEY = 'kota.memo';
+    memo.value = localStorage.getItem(KEY) || '';
+    let t;
+    memo.addEventListener('input', () => {
+      clearTimeout(t);
+      stat.textContent = 'Saving...';
+      t = setTimeout(() => {
+        localStorage.setItem(KEY, memo.value);
+        stat.textContent = 'Saved.';
+      }, 250);
+    });
+  }
+
+  // Request: mailto 生成（メールアドレスを自分のものに変更してね）
+  const form = document.getElementById('req-form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const title = (f.get('title') || '').toString().trim();
+      const detail = (f.get('detail') || '').toString().trim();
+      const contact = (f.get('contact') || '').toString().trim();
+      const to = 'hello@example.com'; // ← ここを変更
+      const subject = encodeURIComponent(`[Request] ${title}`);
+      const body = encodeURIComponent(
+`◆ リクエスト
+${detail}
+
+◆ 連絡先
+${contact || '（未記入）'}
+
+--- Sent from Kota Portfolio`
+      );
+      location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    });
+  }
+})();
+  </script>
+
+  <!-- 🔥 Opinions（Firebase） -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp,
+             query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    /* TODO: あなたの Firebase 設定に置き換え */
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    const OPINIONS = collection(db, "opinions");
+
+    const form = document.getElementById("op-form");
+    const list = document.getElementById("op-list");
+    const hint = document.getElementById("op-hint");
+
+    const esc = (s) => (s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const linkify = (s) => esc(s).replace(/\bhttps?:\/\/[^\s)]+/g, url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+    const timefmt = (ts) => {
+      if (!ts) return "now";
+      const d = ts.toDate();
+      const pad = n => String(n).padStart(2,'0');
+      return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const name = (fd.get("name") || "").toString().trim().slice(0,24);
+        const message = (fd.get("message") || "").toString().trim().slice(0,500);
+        const contact = (fd.get("contact") || "").toString().trim().slice(0,80);
+
+        if (!name || !message) return;
+
+        const key = "op.lastPostAt";
+        const last = Number(localStorage.getItem(key) || "0");
+        const now  = Date.now();
+        if (now - last < 10_000) {
+          hint.textContent = "少し待ってから投稿してください（スパム対策）";
+          return;
+        }
+
+        try {
+          await addDoc(OPINIONS, {
+            name, message, contact,
+            createdAt: serverTimestamp(),
+            ua: navigator.userAgent.slice(0,120)
+          });
+          localStorage.setItem(key, String(now));
+          form.reset();
+          hint.textContent = "投稿しました。ありがとう！";
+        } catch (err) {
+          console.error(err);
+          hint.textContent = "投稿に失敗しました。時間をおいて再度お試しください。";
+        }
+      });
+    }
+
+    const q = query(OPINIONS, orderBy("createdAt","desc"), limit(50));
+    onSnapshot(q, (snap) => {
+      list.innerHTML = "";
+      snap.forEach(doc => {
+        const d = doc.data();
+        const el = document.createElement("div");
+        el.className = "op-item";
+        el.innerHTML = `
+          <div class="op-head">
+            <span class="op-name">${esc(d.name || "anon")}</span>
+            ${d.contact ? `<span class="muted">· ${esc(d.contact)}</span>` : ""}
+            <span class="op-time">${timefmt(d.createdAt)}</span>
+          </div>
+          <div class="op-msg">${linkify(d.message || "")}</div>
+        `;
+        list.appendChild(el);
+      });
+      if (!snap.size) {
+        const empty = document.createElement("div");
+        empty.className = "muted";
+        empty.textContent = "まだ投稿はありません。最初の一言をどうぞ！";
+        list.appendChild(empty);
+      }
+    });
+  </script>
+
+</body>
+</html>
